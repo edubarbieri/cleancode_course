@@ -9,8 +9,7 @@ function validate(input) {
   if (cpf.length != 11 || hasOnlySameCharacter(cpf)) {
     return false;
   }
-  const digit1 = calculateFirstDigit(cpf);
-  const expectedCheckDigits = "" + digit1 + calculateSecondDigit(cpf, digit1);
+  const expectedCheckDigits = `${calculateFirstDigit(cpf)}${calculateSecondDigit(cpf)}`;
   const checkDigits = cpf.substring(cpf.length - 2, cpf.length);
   return expectedCheckDigits == checkDigits;
 }
@@ -24,16 +23,15 @@ function sanitizeCpfInput(cpf) {
 
 function hasOnlySameCharacter(cpf) {
   const firstDigit = cpf[0];
-  return cpf.split("").every((currentDigit) => currentDigit === firstDigit);
+  return [...cpf].every((currentDigit) => currentDigit === firstDigit);
 }
 
 function calculateFirstDigit(cpf) {
-  return calculateDigit(cpf.split("").slice(0, 9));
+  return calculateDigit([...cpf].slice(0, 9));
 }
 
-function calculateSecondDigit(cpf, firstDigit) {
-  const cpfAndDigit1 = cpf.split("").slice(0, 9);
-  cpfAndDigit1.push(firstDigit);
+function calculateSecondDigit(cpf) {
+  const cpfAndDigit1 = [...cpf].slice(0, 10);
   return calculateDigit(cpfAndDigit1);
 }
 
@@ -47,6 +45,6 @@ function reduceDigits(digits) {
   const divider = digits.length + 1;
   return digits.reduce((previousValue, currentValue, index) => {
     const factor = divider - index;
-    return previousValue + currentValue * factor;
+    return previousValue + parseInt(currentValue) * factor;
   }, 0);
 }

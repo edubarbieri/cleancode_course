@@ -1,12 +1,12 @@
 const example2 = require('./example2_after')
 
-test("Deve validar cpf valido", () =>{
+test("Deve validar cpf", () =>{
   const cpf = "31139584073"
   const valid = example2.validate(cpf);
   expect(valid).toBeTruthy()
 })
 
-test("Deve validar cpf inválido", () =>{
+test("Deve tentar validar cpf inválido", () =>{
   const cpf = "31139583071"
   const valid = example2.validate(cpf);
   expect(valid).toBeFalsy()
@@ -38,6 +38,12 @@ test("Deve validar cpf com quantidade invalida de caracteres", () =>{
 
 test("Deve validar cpf com valor null", () =>{
   const cpf = null
+  const valid = example2.validate(cpf);
+  expect(valid).toBeFalsy()
+})
+
+test("Deve validar cpf com valor undefined", () =>{
+  const cpf = undefined
   const valid = example2.validate(cpf);
   expect(valid).toBeFalsy()
 })

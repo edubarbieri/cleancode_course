@@ -6,7 +6,8 @@
   "scripts": {
     "tsc:init": "tsc --init",
     "build": "tsc",
-    "test": "jest --coverage src/"
+    "test": "jest src/",
+    "coverage": "jest --coverage src/"
   },
   "keywords": [],
   "author": "",
