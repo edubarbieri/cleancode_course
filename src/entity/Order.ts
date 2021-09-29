@@ -1,29 +1,32 @@
-import Item from "./Item";
-import * as Cpf from "../tools/Cpf";
+import OrderItem from "./OrderItem";
 import Coupon from "./Coupon";
+import Cpf from "./Cpf";
+import Product from "./Product";
 
 export default class Order {
-  items: Item[];
+  cpf: Cpf;
+  items: OrderItem[];
   coupons: Coupon[];
-  constructor(private cpf: string) {
-    if (!Cpf.validate(this.cpf)) {
-      throw new Error("Invalid Cpf");
-    }
+  constructor(cpf: string) {
+    this.cpf = new Cpf(cpf);
     this.items = [];
     this.coupons = [];
   }
 
-  addItem(item: Item) {
-    this.items.push(item);
+  addItem(product: Product, quantity: number) {
+    this.items.push(new OrderItem(product, quantity, product.price));
   }
 
   addCoupon(coupon: Coupon) {
+    if (coupon.isExpired()) {
+      throw new Error("Coupon is expired");
+    }
     this.coupons.push(coupon);
   }
 
   getItemsPrice() {
     return this.items
-      .map((item) => item.getTotalPrice())
+      .map((item) => item.getTotal())
       .reduce(
         (prevValue: number, currentValue: number) => prevValue + currentValue,
         0
@@ -35,12 +38,23 @@ export default class Order {
     return this.coupons
       .map((coupon) => coupon.discountPercent)
       .reduce((prevValue: number, currentValue: number) => {
-        const discount = itemsPrice * (currentValue / 100)
-        return prevValue + discount 
+        const discount = itemsPrice * (currentValue / 100);
+        return prevValue + discount;
       }, 0);
   }
 
-  getTotalPrice() {
+  getTotal() {
     return this.getItemsPrice() - this.getTotalDiscount();
+  }
+
+  getShippingPrice(distance: number) {
+    const dimensions = this.items
+      .map((item) => item.product)
+      .map((product) => product.dimension);
+    let price = 0;
+    for (const dimension of dimensions) {
+      price += distance * dimension.calculateVolume() * (dimension.calculateDensity() / 100)
+    }
+    return price < 10 ? 10.0 : price
   }
 }

@@ -1,3 +1,12 @@
 export default class Coupon {
-  constructor(public code: string, public discountPercent: number){}
+  constructor(
+    readonly code: string,
+    readonly discountPercent: number,
+    readonly expirationDate: Date,
+    readonly currentDate: Date
+  ) {}
+
+  isExpired(): boolean {
+    return this.currentDate > this.expirationDate;
+  }
 }
