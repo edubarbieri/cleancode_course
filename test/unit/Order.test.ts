@@ -1,7 +1,7 @@
-import Coupon from "../../src/entity/Coupon"
-import Dimension from "../../src/entity/Dimension"
-import Order from "../../src/entity/Order"
-import Product from "../../src/entity/Product"
+import Coupon from "../../src/domain/entity/Coupon"
+import Dimension from "../../src/domain/entity/Dimension"
+import Order from "../../src/domain/entity/Order"
+import Product from "../../src/domain/entity/Product"
 
 
 function basicDimension(): Dimension{
@@ -40,9 +40,9 @@ test("Deve calcular o valor total dos itens", () => {
 test("Deve calcular o total de descontos", () => {
   const cpf = "061.584.100-71"
 
-  const order = new Order(cpf)
+  const order = new Order(cpf, new Date("2021-09-28"))
   order.addItem(new Product("1", "Masculino", "Camiseta", 50.00, basicDimension()), 2)
-  order.addCoupon(new Coupon("1323", 30, new Date("2021-11-01"), new Date("2021-09-28")))
+  order.addCoupon(new Coupon("1323", 30, new Date("2021-11-01"),))
   expect(order.getTotalDiscount()).toBe(30.0)
 
 })
@@ -50,41 +50,31 @@ test("Deve calcular o total de descontos", () => {
 test("Deve calcular o total do pedido incluindo discontos", () => {
   const cpf = "061.584.100-71"
 
-  const order = new Order(cpf)
+  const order = new Order(cpf, new Date("2021-09-28"))
   order.addItem(new Product("1", "Masculino", "Camiseta", 50.00, basicDimension()), 2)
-  order.addCoupon(new Coupon("1323", 30, new Date("2021-11-01"), new Date("2021-09-28")))
+  order.addCoupon(new Coupon("1323", 30, new Date("2021-11-01")))
   expect(order.getTotal()).toBe(70.0)
 
 })
 test("Não deve adicionar cupom expirado", () => {
-  const order = new Order("061.584.100-71")
+  const order = new Order("061.584.100-71", new Date("2021-12-28"))
   order.addItem(new Product("1", "Masculino", "Camiseta", 50.00, basicDimension()), 2)
   expect(() => {
-    order.addCoupon(new Coupon("1323", 30, new Date("2021-11-01"), new Date("2021-12-28")))
+    order.addCoupon(new Coupon("1323", 30, new Date("2021-11-01")))
   }).toThrow(new Error("Coupon is expired"))
-
 })
 
-test("Deve calcular o valor do frete", () => {
+test("Deve calcular o valor total de frete", () => {
   const order = new Order("061.584.100-71")
-  const dim = new Dimension(100, 30, 10, 3);
-  order.addItem(new Product("1", "Guitarra", "Guitarra", 5000.00, dim), 1)
-  const shippingPrice = order.getShippingPrice(1000)
-  expect(shippingPrice).toBe(30)
-})
+  const product = new Product("1", "Masculino", "Camiseta", 50.00, new Dimension(20, 15, 10, 1));
+  const product2 = new Product("1", "Geladeira", "Geladeira", 5000.00, new Dimension(200, 100, 50, 40))
+  order.addItem(product, 1)
+  order.addItem(product2, 2)
 
-test("Deve calcular o valor do frete com valor minimo de R$10,00", () => {
-  const order = new Order("061.584.100-71")
-  const dim = new Dimension(20, 15, 10, 1);
-  order.addItem(new Product("1", "Masculino", "Camiseta", 50.00, dim), 1)
-  const shippingPrice = order.getShippingPrice(1000)
-  expect(shippingPrice).toBe(10)
-})
+  const freight = order.getShippingPrice(1000);
 
-test("Deve calcular o valor do frete da geladeira", () => {
-  const order = new Order("061.584.100-71")
-  const dim = new Dimension(200, 100, 50, 40);
-  order.addItem(new Product("1", "Geladeira", "Geladeira", 5000.00, dim), 1)
-  const shippingPrice = order.getShippingPrice(1000)
-  expect(shippingPrice).toBe(400)
+  expect(freight).toBe(810)
+
+
+
 })

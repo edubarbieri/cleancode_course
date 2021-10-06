@@ -1,4 +1,4 @@
-import Cpf from "../../src/entity/Cpf"
+import Cpf from "../../src/domain/entity/Cpf"
 
 test("Deve validar cpf valido", () =>{
   const cpf = new Cpf("31139584073")

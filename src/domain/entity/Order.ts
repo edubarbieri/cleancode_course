@@ -4,10 +4,11 @@ import Cpf from "./Cpf";
 import Product from "./Product";
 
 export default class Order {
-  cpf: Cpf;
+  private cpf: Cpf;
   items: OrderItem[];
   coupons: Coupon[];
-  constructor(cpf: string) {
+
+  constructor(cpf: string, readonly issueDate: Date = new Date()) {
     this.cpf = new Cpf(cpf);
     this.items = [];
     this.coupons = [];
@@ -18,7 +19,7 @@ export default class Order {
   }
 
   addCoupon(coupon: Coupon) {
-    if (coupon.isExpired()) {
+    if (coupon.isExpired(this.issueDate)) {
       throw new Error("Coupon is expired");
     }
     this.coupons.push(coupon);
@@ -47,14 +48,11 @@ export default class Order {
     return this.getItemsPrice() - this.getTotalDiscount();
   }
 
-  getShippingPrice(distance: number) {
-    const dimensions = this.items
-      .map((item) => item.product)
-      .map((product) => product.dimension);
-    let price = 0;
-    for (const dimension of dimensions) {
-      price += distance * dimension.calculateVolume() * (dimension.calculateDensity() / 100)
-    }
-    return price < 10 ? 10.0 : price
+  getShippingPrice(distance: number) : number {
+    return this.items
+      .map(item => item.getShippingPrice(distance))
+      .reduce((previous: number, current: number) => previous + current, 0)
   }
+  
+
 }
