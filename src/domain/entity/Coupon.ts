@@ -6,10 +6,13 @@ export default class Coupon {
   ) {}
 
   isExpired(currentDate: Date = new Date()): boolean {
-    if (!this.expirationDate){
+    if (!this.expirationDate) {
       return false;
     }
-    return currentDate > this.expirationDate;
+    return this.expirationDate.getTime() < currentDate.getTime();
+  }
 
+  isValid(currentDate: Date = new Date()): boolean {
+    return !this.isExpired(currentDate);
   }
 }

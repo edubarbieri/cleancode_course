@@ -2,27 +2,31 @@ import OrderItem from "./OrderItem";
 import Coupon from "./Coupon";
 import Cpf from "./Cpf";
 import Product from "./Product";
+import OrderNumber from "./OrderNumber";
 
 export default class Order {
   private cpf: Cpf;
   items: OrderItem[];
-  coupons: Coupon[];
+  coupon: Coupon | undefined;
+  number: OrderNumber
+  shippingPrice: number;
 
-  constructor(cpf: string, readonly issueDate: Date = new Date()) {
+  constructor(cpf: string, readonly issueDate: Date = new Date(), readonly sequence: number = 1) {
     this.cpf = new Cpf(cpf);
     this.items = [];
-    this.coupons = [];
+    this.number = new OrderNumber(issueDate, sequence)
+    this.shippingPrice = 0;
   }
 
   addItem(product: Product, quantity: number) {
-    this.items.push(new OrderItem(product, quantity, product.price));
+    this.items.push(new OrderItem(product.id, quantity, product.price));
   }
 
   addCoupon(coupon: Coupon) {
     if (coupon.isExpired(this.issueDate)) {
       throw new Error("Coupon is expired");
     }
-    this.coupons.push(coupon);
+    this.coupon = coupon;
   }
 
   getItemsPrice() {
@@ -35,24 +39,36 @@ export default class Order {
   }
 
   getTotalDiscount() {
+    if(!this.coupon){
+      return 0
+    }
     const itemsPrice = this.getItemsPrice();
-    return this.coupons
-      .map((coupon) => coupon.discountPercent)
-      .reduce((prevValue: number, currentValue: number) => {
-        const discount = itemsPrice * (currentValue / 100);
-        return prevValue + discount;
-      }, 0);
+    return itemsPrice * (this.coupon?.discountPercent / 100);
   }
 
   getTotal() {
-    return this.getItemsPrice() - this.getTotalDiscount();
+    return (this.getItemsPrice() + this.shippingPrice) - this.getTotalDiscount();
   }
 
-  getShippingPrice(distance: number) : number {
-    return this.items
-      .map(item => item.getShippingPrice(distance))
-      .reduce((previous: number, current: number) => previous + current, 0)
+  getShippingPrice() : number {
+    return this.shippingPrice
   }
+
+  getCpf () {
+		return this.cpf.value;
+	}
+
+	getCoupon () {
+		return this.coupon?.code;
+	}
+
+	getCode () {
+		return this.number.value;
+	}
+
+	getOrderItems () {
+		return this.items;
+	}
   
 
 }

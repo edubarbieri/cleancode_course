@@ -5,10 +5,10 @@ export default class DatabaseConnectionAdapter implements DatabaseConnection {
   pgp: any;
 
   constructor() {
-    this.pgp = pgp()("postgres://postgres:123456@localhost:5432/app");
+    this.pgp = pgp()("postgres://dev:teste12@aspire.home:5432/dev");
   }
 
-  query(statement: string, params: any) {
+  query(statement: string, params: any = []) {
     return this.pgp.query(statement, params);
   }
 }

@@ -7,15 +7,17 @@ export default class ItemRepositoryMemory implements ProductRepository {
 
   constructor () {
       this.products = [
-          new Product("1", "Instrumentos Musicais", "Guitarra", 1000, new Dimension(1, 2, 3, 4)),
-          new Product("2", "Instrumentos Musicais", "Amplificador", 5000, new Dimension(1, 2, 3, 4)),
-          new Product("3", "Instrumentos Musicais", "Cabo", 30, new Dimension(1, 2, 3, 4))
+          new Product(1, "Instrumentos Musicais", "Guitarra", 1000, new Dimension(100, 50, 15, 3)),
+          new Product(2, "Instrumentos Musicais", "Amplificador", 5000, new Dimension(50, 50, 50, 22)),
+          new Product(3, "Instrumentos Musicais", "Cabo", 30, new Dimension(10, 10, 10, 1))
       ]
   }
 
-  async findById(productId: string): Promise<Product> {
+  async findById(productId: number): Promise<Product> {
       const item = this.products.find(prod => prod.id === productId);
-      if (!item) throw new Error("Product not found");
+      if (!item){
+        throw new Error("Product not found");
+      }
       return item;
   }
 }
