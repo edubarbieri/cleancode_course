@@ -1,4 +1,5 @@
 import Order from "../../../domain/entity/Order";
+import OrderItem from "../../../domain/entity/OrderItem";
 import OrderRepository from "../../../domain/repository/OrderRepository";
 import DatabaseConnection from "../../database/DatabaseConnection";
 
@@ -6,6 +7,8 @@ export default class OrderRepositoryDatabase implements OrderRepository {
 
 	constructor (readonly databaseConnection: DatabaseConnection) {
 	}
+
+
 
 	async save(order: Order): Promise<void> {
 		// begin
@@ -47,5 +50,37 @@ export default class OrderRepositoryDatabase implements OrderRepository {
 			)
 		}
 		// commit
+	}
+
+
+	async findByCode(code: string): Promise<Order> {
+		const [orderData] = await this.databaseConnection.query('select * from ccca.order where code = $1',[code])
+		if (!orderData){
+			throw new Error("Coupon not found");
+		}
+		const order = new Order(orderData.cpf, orderData.issue_date)
+		order.shippingPrice = orderData.freight
+		const itemsData = await this.databaseConnection.query('select * from ccca.order_item where id_order = $1',[orderData.id])
+		for (const orderItem of itemsData) {
+			order.items.push(new OrderItem(orderItem.id_item, orderItem.quantity, orderItem.price))
+		}
+		return order;
+	}
+
+
+	async findAll(): Promise<Order[]> {
+		const orders: Order[] = []
+		const ordersData = await this.databaseConnection.query('select * from ccca.order', [])
+
+		for (const orderData of ordersData) {
+			const order = new Order(orderData.cpf, orderData.issue_date)
+			order.shippingPrice = orderData.freight
+			const itemsData = await this.databaseConnection.query('select * from ccca.order_item where id_order = $1',[orderData.id])
+			for (const orderItem of itemsData) {
+				order.items.push(new OrderItem(orderItem.id_item, orderItem.quantity, orderItem.price))
+			}
+			orders.push(order)
+		}
+		return orders;
 	}
 }

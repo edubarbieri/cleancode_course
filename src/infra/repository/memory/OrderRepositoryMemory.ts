@@ -7,9 +7,15 @@ export default class OrderRepositoryMemory implements OrderRepository {
   constructor() {
     this.orders = [];
   }
-
+  
   save(order: Order): Promise<void> {
     this.orders.push(order);
     return Promise.resolve()
+  }
+  findByCode(code: string): Promise<Order> {
+    throw new Error("Method not implemented.");
+  }
+  findAll(): Promise<Order[]> {
+    throw new Error("Method not implemented.");
   }
 }
