@@ -1,16 +1,21 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, Router} from "express";
 import GetOrders from "../../../application/usecase/GetOrders";
 import OrderRepository from "../../../domain/repository/OrderRepository";
 
 export default class OrderController {
-  constructor(app: Router, readonly orderRepository: OrderRepository) {
-    app.get("/", this.findAll)
+  constructor(readonly orderRepository: OrderRepository) { 
+  }
+
+  getRouter(){
+    const orderRouter =  Router()
+    orderRouter.get("/order", this.findAll.bind(this))
+    return orderRouter;
   }
 
   async findAll(req: Request, resp: Response) {
     const getOrders = new GetOrders(this.orderRepository)
-    resp.json(await getOrders.execute())
+    const orders = await getOrders.execute()
+    resp.json(orders)
   }
-
   
 }
