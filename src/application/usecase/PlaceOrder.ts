@@ -1,4 +1,5 @@
 import Order from "../../domain/entity/Order";
+import AbstractRepositoryFactory from "../../domain/factory/AbstractRepositoryFactory";
 import CouponRepository from "../../domain/repository/CouponRepository";
 import OrderRepository from "../../domain/repository/OrderRepository";
 import ProductRepository from "../../domain/repository/ProductRepository";
@@ -8,11 +9,14 @@ import PlaceOrderOutput from "../dto/PlaceOrderOutput";
 import PlaceOrderOutputAssembler from "../dto/PlaceOrderOutputAssembler";
 
 export default class PlaceOrder {
-  constructor(
-    readonly productRepository: ProductRepository,
-    readonly orderRepository: OrderRepository,
-    readonly couponRepository: CouponRepository 
-  ) {}
+  productRepository: ProductRepository;
+  couponRepository: CouponRepository;
+  orderRepository: OrderRepository;
+  constructor(repositoryFactory: AbstractRepositoryFactory) {
+    this.productRepository = repositoryFactory.createProductRepository();
+    this.couponRepository = repositoryFactory.createCouponRepository();
+    this.orderRepository = repositoryFactory.createOrderRepository();
+  }
 
   async execute(input: PlaceOrderInput): Promise<PlaceOrderOutput> {
     const order = new Order(input.cpf, input.issueDate);

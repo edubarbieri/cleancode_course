@@ -7,7 +7,7 @@ export default class OrderController {
   }
 
   getRouter(){
-    const orderRouter =  Router()
+    const orderRouter = Router()
     orderRouter.get("/order", this.findAll.bind(this))
     return orderRouter;
   }

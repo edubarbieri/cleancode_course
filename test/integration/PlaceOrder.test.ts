@@ -4,6 +4,15 @@ import PlaceOrder from "../../src/application/usecase/PlaceOrder";
 import PlaceOrderInput from "../../src/application/dto/PlaceOrderInput";
 import DatabaseConnectionAdapter from "../../src/infra/database/DatabaseConnectionAdapter";
 import CouponRepositoryDatabase from "../../src/infra/repository/database/CouponRepositoryDatabase";
+import DatabaseRepositoryFactory from "../../src/infra/factory/DatabaseRepositoryFactory";
+
+let placeOrder: PlaceOrder;
+
+beforeEach(function () {
+	const databaseConnection = new DatabaseConnectionAdapter();
+	placeOrder = new PlaceOrder(new DatabaseRepositoryFactory(databaseConnection));
+});
+
 
 test("Deve fazer um pedido", async function () {
   const input = new PlaceOrderInput(
@@ -25,12 +34,7 @@ test("Deve fazer um pedido", async function () {
     new Date("2021-03-01"),
     "VALE20"
   );
-  const databaseConnectionAdapter = new DatabaseConnectionAdapter()
-  const placeOrder = new PlaceOrder(
-    new ProductRepositoryDatabase(databaseConnectionAdapter),
-    new OrderRepositoryDatabase(databaseConnectionAdapter),
-    new CouponRepositoryDatabase(databaseConnectionAdapter)
-  );
+
   const output = await placeOrder.execute(input);
   expect(output.total).toBe(5132);
   expect(output.code).toBe("202100000001");

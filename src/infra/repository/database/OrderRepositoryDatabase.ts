@@ -16,11 +16,11 @@ export default class OrderRepositoryDatabase implements OrderRepository {
 			insert into 
 				ccca.order 
 			(
-				code, cpf, issue_date, freight, sequence, coupon
+				code, cpf, issue_date, freight, sequence, coupon, total
 			) 
 			values 
 			(
-				$1, $2, $3, $4, $5, $6
+				$1, $2, $3, $4, $5, $6, $7
 			) 
 			returning *`, 
 			[
@@ -29,7 +29,8 @@ export default class OrderRepositoryDatabase implements OrderRepository {
 				order.issueDate, 
 				order.getShippingPrice(), 
 				order.sequence, 
-				order.getCoupon()
+				order.getCoupon(),
+				order.getTotal()
 			]
 		);
 		for (const orderItem of order.getOrderItems()) {
